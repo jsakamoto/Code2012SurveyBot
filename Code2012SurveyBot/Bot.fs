@@ -3,6 +3,7 @@ open System.Configuration
 open System.Linq
 open System.Net
 open System.Text
+open System.Text.RegularExpressions
 open Newtonsoft.Json
 open Twitterizer
 open Raven.Client.Document
@@ -41,7 +42,7 @@ open Raven.Client.Document
         session.SaveChanges()
 
         let hashtag = ConfigurationManager.AppSettings.["hashtag"]
-        let msg  = nextTweetTo.Free_Comment
+        let msg  = Regex.Replace(nextTweetTo.Free_Comment, @"[ \t\r\n]", "")
         let msg' = msg.Substring(0, min (msg.Length) (140 - 1 - hashtag.Length)) + " " + hashtag
 
         let key = ConfigurationManager.AppSettings.["twitterKey"]
