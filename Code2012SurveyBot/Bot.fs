@@ -5,6 +5,7 @@ open System.Net
 open System.Text
 open Newtonsoft.Json
 open Twitterizer
+open Raven.Client.Document
 
     type Reply = {Id:int; Free_Comment:string}
 
@@ -17,10 +18,26 @@ open Twitterizer
             |> Array.filter (fun x -> System.String.IsNullOrEmpty(x.Free_Comment) = false)
             |> Array.sortBy (fun x -> x.Id) 
 
-    let Tweet () = 
-        //replies
+    type RavenConnSetting = {Url:string; ApiKey:string}
 
-        //let rep = replies.Last()
+    let Tweet () = 
+        
+//        let connSetting = JsonConvert.DeserializeObject<RavenConnSetting>(ConfigurationManager.AppSettings.["RAVENHQ_CONNECTION_STRING"])
+//        use docStore = new DocumentStore()
+//        docStore.Url <- connSetting.Url
+//        docStore.ApiKey <- connSetting.ApiKey
+//        use session = docStore.Initialize().OpenSession()
+//        
+//        let lastTweets = session.Query<Reply>().ToArray()
+//        let nextTweetTo = 
+//            if lastTweets.Any() then
+//                let nexts = replies.Where(fun x -> x.Id > lastTweets.First().Id)
+//                if nexts.Any() then nexts.First() else replies.First()
+//            else
+//                replies.First()
+//
+//        nextTweetTo
+
 
         let key = ConfigurationManager.AppSettings.["twitterKey"]
         let tokens = JsonConvert.DeserializeObject<OAuthTokens>(key)
