@@ -8,3 +8,4 @@ type BotController() =
     [<HttpGet>]
     member this.Ping() = 
         Bot.Tweet()
+        true

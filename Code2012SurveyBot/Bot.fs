@@ -1,5 +1,6 @@
 ﻿module Code2012SurveyBot.Bot
 open System.Configuration
+open System.Linq
 open System.Net
 open System.Text
 open Newtonsoft.Json
@@ -14,11 +15,14 @@ open Twitterizer
             |> webClient.DownloadString
             |> fun x -> JsonConvert.DeserializeObject<Reply[]>(x)
             |> Array.filter (fun x -> System.String.IsNullOrEmpty(x.Free_Comment) = false)
+            |> Array.sortBy (fun x -> x.Id) 
 
     let Tweet () = 
-        replies        
+        //replies
 
-//        let key = ConfigurationManager.AppSettings.["twitterKey"]
-//        let tokens = JsonConvert.DeserializeObject<OAuthTokens>(key)
-//        TwitterStatus.Update(tokens, "message.") |> ignore
+        //let rep = replies.Last()
+
+        let key = ConfigurationManager.AppSettings.["twitterKey"]
+        let tokens = JsonConvert.DeserializeObject<OAuthTokens>(key)
+        TwitterStatus.Update(tokens, "AppHarbor 上からもツイートできるだろうか。") |> ignore
 
