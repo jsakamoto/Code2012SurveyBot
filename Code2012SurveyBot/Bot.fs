@@ -1,4 +1,5 @@
 ﻿module Code2012SurveyBot.Bot
+open System
 open System.Configuration
 open System.Linq
 open System.Net
@@ -17,10 +18,15 @@ open Raven.Client.Document
         "http://code-survey.herokuapp.com/surveys.json"
             |> webClient.DownloadString
             |> fun x -> JsonConvert.DeserializeObject<Reply[]>(x)
-            |> Array.filter (fun x -> System.String.IsNullOrEmpty(x.Free_Comment) = false)
+            |> Array.filter (fun x -> String.IsNullOrEmpty(x.Free_Comment) = false)
             |> Array.sortBy (fun x -> x.Id) 
 
     type LastTweet = {RepId:int}
+
+    let (|??) opt def =
+        match opt with
+        |Some(a) -> a
+        |None -> def
 
     /// Tweet free commnets of "Code 2012 Survey" sequencialy.
     let Tweet () = 
@@ -31,18 +37,13 @@ open Raven.Client.Document
         docStore.Url <- connSetting.["Url"]
         docStore.ApiKey <- connSetting.["ApiKey"]
         use session = docStore.Initialize().OpenSession()
-        let lastTweets = session.Query<LastTweet>().ToArray()
 
         // Chose the message to next tweet and store to RavenDB.
+        let lastTweet = session.Query<LastTweet>() |> Seq.tryFind (fun _-> true) |?? {RepId = -1}
         let reps = replies()
-        let nextTweetTo = 
-            if lastTweets.Any() then
-                let lastTweet = lastTweets.First()
-                session.Delete(lastTweet)
-                let nexts = reps.Where(fun x -> x.Id > lastTweet.RepId).ToArray()
-                if nexts.Any() then nexts.First() else reps.First()
-            else
-                reps.First()
+        let nextTweetTo = reps |> Seq.tryFind (fun x -> x.Id > lastTweet.RepId) |?? reps.First()
+
+        if lastTweet.RepId <> -1 then session.Delete(lastTweet)
         session.Store({RepId = nextTweetTo.Id})
         session.SaveChanges()
 
