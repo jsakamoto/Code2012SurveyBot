@@ -42,6 +42,7 @@
   <ItemGroup>
     <Compile Include="Bot.fs" />
     <Compile Include="Controller.fs" />
+    <Compile Include="App.fs" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>

@@ -23,11 +23,6 @@ open Raven.Client.Document
 
     type LastTweet = {RepId:int}
 
-    let (|??) opt def =
-        match opt with
-        |Some(a) -> a
-        |None -> def
-
     /// Tweet free commnets of "Code 2012 Survey" sequencialy.
     let Tweet () = 
 
@@ -39,6 +34,7 @@ open Raven.Client.Document
         use session = docStore.Initialize().OpenSession()
 
         // Chose the message to next tweet and store to RavenDB.
+        let (|??) opt def = defaultArg opt def
         let lastTweet = session.Query<LastTweet>() |> Seq.tryFind (fun _-> true) |?? {RepId = -1}
         let reps = replies()
         let nextTweetTo = reps |> Seq.tryFind (fun x -> x.Id > lastTweet.RepId) |?? reps.First()
